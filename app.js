@@ -9,8 +9,6 @@ app.use(logger('dev'));
 
 app.use('/api', index);
 
-app.set('port', process.env.PORT || 8080);
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

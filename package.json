@@ -9,6 +9,7 @@
     "deploy": "caprover deploy -u https://captain.host.qrl.nz -a hctools -b main"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "~4.17.1",
     "morgan": "~1.10.0"
   }

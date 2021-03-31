@@ -7,6 +7,9 @@
 var app = require('../app');
 var debug = require('debug')('node:server');
 var http = require('http');
+var cors = require('cors');
+
+app.use(cors());
 
 /**
  * Get port from environment and store in Express.
@@ -30,7 +33,7 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 
-debug('Server Started on port ' + port);
+log('Server Started on port ' + port);
 /**
  * Normalize a port into a number, string, or false.
  */
