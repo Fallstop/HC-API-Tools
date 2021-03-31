@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./bin/www.js",
     "dev": "nodemon ./bin/www.js",
-    "deploy": "caprover deploy --default"
+    "deploy": "caprover deploy -u https://captain.host.qrl.nz -a hctools -b main"
   },
   "dependencies": {
     "express": "~4.17.1",
