@@ -4,9 +4,10 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('node:server');
-var http = require('http');
+import app from '../app';
+import debugLib from 'debug';
+import http from 'http';
+const debug = debugLib('debug')('node:server');
 
 
 /**
@@ -89,5 +90,5 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  // debug('Listening on ' + bind);
 }

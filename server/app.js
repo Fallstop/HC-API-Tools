@@ -1,16 +1,16 @@
-var express = require('express');
-var path = require('path');
-var logger = require('morgan');
-var cors = require('cors');
+import express from 'express';
+import path from 'path';
+import logger from 'morgan';
+import cors from 'cors';
 
 
-var index = require('./routes/index');
+import apiRouter from './routes/index';
 var app = express();
 
 app.use(cors());
 app.use(logger('dev'));
 
-app.use('/api', index);
+app.use('/api', apiRouter);
 
 
 // catch 404 and forward to error handler
@@ -30,4 +30,4 @@ app.use(function(err, req, res, next) {
   res.json({error: err.message})
 });
 
-module.exports = app;
+export default app;

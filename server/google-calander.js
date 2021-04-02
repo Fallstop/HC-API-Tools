@@ -1,4 +1,4 @@
-const {google} = require('googleapis');
+import  { google } from 'googleapis';
 require('dotenv').config();
 
 // Provide the required configuration
@@ -18,7 +18,7 @@ const auth = new google.auth.JWT(
 
 
 // Get all the events between two dates
-async function getEvents (dateTimeStart, dateTimeEnd) {
+export async function getEvents (dateTimeStart, dateTimeEnd) {
 
     try {
         let response = await calendar.events.list({
