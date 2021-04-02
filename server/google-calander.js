@@ -2,9 +2,11 @@ import  { google } from 'googleapis';
 require('dotenv').config();
 
 // Provide the required configuration
+let CREDENTIALS;
+let calendarId;
 try {
-    const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
-    const calendarId = process.env.CALENDAR_ID;
+    CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
+    calendarId = process.env.HC_DAY_CALANDER;
     console.log("Successfully Parsed Credentials")
 } catch {
     console.log("Credentials missing or malformed from .env file (or environment)")
@@ -31,7 +33,7 @@ export async function getEvents (dateTimeStart, dateTimeEnd) {
         let response = await calendar.events.list({
             auth: auth,
             calendarId: calendarId,
-            timeMin: DateTime,
+            timeMin: dateTimeStart,
             timeMax: dateTimeEnd,
             timeZone: 'Pacific/Auckland'
         });

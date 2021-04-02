@@ -4,11 +4,15 @@
  * Module dependencies.
  */
 
-import app from '../app';
+
 import debugLib from 'debug';
 import http from 'http';
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 const debug = debugLib('debug')('node:server');
 
+import app from '../app';
 
 /**
  * Get port from environment and store in Express.
