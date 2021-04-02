@@ -2,8 +2,15 @@ import  { google } from 'googleapis';
 require('dotenv').config();
 
 // Provide the required configuration
-const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
-const calendarId = process.env.CALENDAR_ID;
+try {
+    const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
+    const calendarId = process.env.CALENDAR_ID;
+    console.log("Successfully Parsed Credentials")
+} catch {
+    console.log("Credentials missing or malformed from .env file (or environment)")
+    process.exit(1)
+}
+
 
 // Google calendar API settings
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
