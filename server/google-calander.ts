@@ -1,6 +1,8 @@
 import { google, calendar_v3 } from 'googleapis';
 require('dotenv').config();
 
+import {convertDateToTimePeriodOfDay, convertDateTimeToISODate} from './mod';
+
 // Provide the required configuration
 let CREDENTIALS;
 let HCDayCalendarId;
@@ -26,17 +28,6 @@ const auth = new google.auth.JWT(
     SCOPES
 );
 
-function convertDateToTimePeriodOfDay(inputTime: Date): [Date,Date] {
-    // Get Start and End date for an all-day event today
-    let startDate = new Date(inputTime);
-    let endDate = new Date(inputTime);
-    startDate.setDate(startDate.getDate());
-    // An all-day event is 1 day (or 86400000 ms) long
-    endDate.setDate(new Date(startDate.getTime() + 86400000).getDate());
-    
-    return [startDate,endDate]
-}
-
 // Get all the events between two dates
 export async function getEvents(dateTimeStart, dateTimeEnd, calendarId): Promise<number | calendar_v3.Schema$Event[]> {
 
@@ -57,8 +48,8 @@ export async function getEvents(dateTimeStart, dateTimeEnd, calendarId): Promise
     }
 };
 
-export async function getCurrentTimeTableDay () {
-    let [startDate, endDate] = convertDateToTimePeriodOfDay(new Date());
+export async function getCurrentTimeTableDay (dateToGet: Date) {
+    let [startDate, endDate] = convertDateToTimePeriodOfDay(dateToGet);
 
 	// Retrieve events from google calender API
 	let events = await getEvents(startDate, endDate, HCDayCalendarId);
@@ -71,10 +62,11 @@ export async function getCurrentTimeTableDay () {
     // @ts-ignore
 	for (let event of events) {
 		// Matches events containing day, then captures the number following, (Case insensitive)
-        console.log("events",event)
         if (event["summary"] === undefined) {continue}
 		let regexCapture = event["summary"].match(/Day ?(\d{1,2})/mi);
 		if (regexCapture) {
+            // Filter weirdness of day notices from other days
+            if (event["start"]["date"] !== convertDateTimeToISODate(dateToGet)) {continue}
 
 			dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
 			isSchoolDay = true
@@ -84,7 +76,7 @@ export async function getCurrentTimeTableDay () {
 		}
 	}
 	// If the perimeter is undefined, res.json ignores it on the other end
-	return { currentDay: dayNumber, isSchoolDay: isSchoolDay, error: error, cached: false };
+	return { currentDay: dayNumber, isSchoolDay: isSchoolDay, error: error, cached: false, date: convertDateTimeToISODate(dateToGet) };
 }
 
 export async function getDailyNotice(date:Date) {

@@ -1,37 +1,37 @@
 import express from 'express';
-import { getCurrentTimeTableDay, getDailyNotice } from '../google-calander';
-
 export let apiRouter = express.Router();
+
+import { getCurrentTimeTableDay, getDailyNotice } from '../google-calander';
+import { TimeTableDayHash, convertDateTimeToISODate } from '../mod';
 
 require('dotenv').config();
 
 const useCache = (process.env.NODE_ENV == "production");
 
-let currentDayCache: { data: Object, cache_day: String; };
+
+
+let currentDayCache: TimeTableDayHash = {};
 
 /* GET Time Table Day. */
-apiRouter.get('/gettimetableday', async function (req: express.Request, res: express.Response) {
+apiRouter.get('/gettimetableday/:date?', async function (req: express.Request, res: express.Response) {
+	let dateTimeToGet = new Date(req.params.date || Date.now());
 	// Get Current Date and remove time
-	let now = new Date();
-	let nowDate = now.toISOString().split("T")[0];
+	let dateToGet: string = convertDateTimeToISODate(dateTimeToGet);
 
 	// Check cache for HIT
-	if (currentDayCache !== undefined && useCache) {
-		console.log("yes", currentDayCache["cache_day"], nowDate);
-		if (currentDayCache["cache_day"] == nowDate) {
-			console.log("Using Cache");
-			let cachedResponse = currentDayCache["data"];
-			cachedResponse["cached"] = true;
-			res.json(cachedResponse);
-			return;
-		}
+	if (currentDayCache[dateToGet] !== undefined && useCache) {
+		console.log("Using Cache");
+		let cachedResponse = currentDayCache[dateToGet];
+		cachedResponse["cached"] = true;
+		res.json(cachedResponse);
+		return;
 	}
 
 	// Cache MISS, retrieving currentDay
-	console.log("Cache MISS, retrying fresh data for ", nowDate);
-	let response = await getCurrentTimeTableDay();
-	currentDayCache = { data: response, cache_day: nowDate };
-	console.log("Got data", currentDayCache);
+	console.log("Cache MISS, retrying fresh data for ", dateToGet);
+	let response = await getCurrentTimeTableDay(dateTimeToGet);
+	currentDayCache[dateToGet] = response;
+	console.log("Got data", currentDayCache[dateToGet]);
 	res.json(response);
 });
 
