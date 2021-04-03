@@ -53,7 +53,7 @@ export async function getCurrentTimeTableDay () {
 	// An all-day event is 1 day (or 86400000 ms) long
 	endDate.setDate(new Date(startDate.getTime() + 86400000).getDate());
 
-	// Retrive events from google calander API
+	// Retrieve events from google calender API
 	let events = await getEvents(startDate, endDate);
     if (events === 0) {
         return { error: "API Error", cached: false };
@@ -62,18 +62,19 @@ export async function getCurrentTimeTableDay () {
 	let error;
 	let isSchoolDay = false;
     console.log("events",events)
-	// for (let event of events) {
-	// 	// Matches events containg day, then captures the number following, (Case insensitive)
-	// 	let regexCapture = event["summary"].match(/Day ?(\d{1,2})/mi);
-	// 	if (regexCapture) {
+    // @ts-ignore
+	for (let event of events) {
+		// Matches events containing day, then captures the number following, (Case insensitive)
+		let regexCapture = event["summary"].match(/Day ?(\d{1,2})/mi);
+		if (regexCapture) {
 
-	// 		dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
-	// 		isSchoolDay = true
-	// 		console.log("Found Day Number: " + dayNumber);
-	// 		console.log(event);
-	// 		console.log(dayNumber);
-	// 	}
-	// }
+			dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
+			isSchoolDay = true
+			console.log("Found Day Number: " + dayNumber);
+			console.log(event);
+			console.log(dayNumber);
+		}
+	}
 	// If the perimeter is undefined, res.json ignores it on the other end
 	return { currentDay: dayNumber, isSchoolDay: isSchoolDay, error: error, cached: false };
 }
