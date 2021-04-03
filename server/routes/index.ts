@@ -1,13 +1,13 @@
 import express from 'express';
-var router = express.Router();
 import { getCurrentTimeTableDay } from '../google-calander';
 
+export let apiRouter = express.Router();
 
 /// {data: ResponseObject, cache_day: DateTime}
 let currentDayCache;
 
 /* GET Time Table Day. */
-router.get('/gettimetableday', async function (req, res) {
+apiRouter.get('/gettimetableday', async function (req, res) {
 	// Get Current Date and remove time
 	let now = new Date();
 	let nowDate = now.toISOString().split("T")[0];
@@ -31,8 +31,5 @@ router.get('/gettimetableday', async function (req, res) {
 	console.log("Got data",currentDayCache)
 	res.json(response);
 });
-
-
-module.exports = router;
 
 

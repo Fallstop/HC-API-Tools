@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+import { google, calendar_v3 } from 'googleapis';
 require('dotenv').config();
 
 // Provide the required configuration
@@ -13,7 +13,6 @@ try {
     process.exit(1);
 }
 
-
 // Google calendar API settings
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
 const calendar = google.calendar({ version: "v3" });
@@ -27,7 +26,7 @@ const auth = new google.auth.JWT(
 
 
 // Get all the events between two dates
-export async function getEvents(dateTimeStart, dateTimeEnd) {
+export async function getEvents(dateTimeStart, dateTimeEnd): Promise<number | calendar_v3.Schema$Event[]> {
 
     try {
         let response = await calendar.events.list({
@@ -38,7 +37,7 @@ export async function getEvents(dateTimeStart, dateTimeEnd) {
             timeZone: 'Pacific/Auckland'
         });
 
-        let items = response["data"]["items"];
+        let items = response["data"].items;
         return items;
     } catch (error) {
         console.log(`Error at getEvents --> ${error}`);
@@ -56,23 +55,25 @@ export async function getCurrentTimeTableDay () {
 
 	// Retrive events from google calander API
 	let events = await getEvents(startDate, endDate);
-
-
+    if (events === 0) {
+        return { error: "API Error", cached: false };
+    }
 	let dayNumber;
 	let error;
 	let isSchoolDay = false;
-	for (let event of events) {
-		// Matches events containg day, then captures the number following, (Case insensitive)
-		let regexCapture = event["summary"].match(/Day ?(\d{1,2})/mi);
-		if (regexCapture) {
+    console.log("events",events)
+	// for (let event of events) {
+	// 	// Matches events containg day, then captures the number following, (Case insensitive)
+	// 	let regexCapture = event["summary"].match(/Day ?(\d{1,2})/mi);
+	// 	if (regexCapture) {
 
-			dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
-			isSchoolDay = true
-			console.log("Found Day Number: " + dayNumber);
-			console.log(event);
-			console.log(dayNumber);
-		}
-	}
+	// 		dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
+	// 		isSchoolDay = true
+	// 		console.log("Found Day Number: " + dayNumber);
+	// 		console.log(event);
+	// 		console.log(dayNumber);
+	// 	}
+	// }
 	// If the perimeter is undefined, res.json ignores it on the other end
 	return { currentDay: dayNumber, isSchoolDay: isSchoolDay, error: error, cached: false };
 }
