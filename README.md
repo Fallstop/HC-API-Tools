@@ -6,7 +6,8 @@ Root: https://hctools.jmw.nz/api
 
 Current methods:
  - `gettimetableday` *Completed*
+ - `getdailynotice/<?date>` *Completed, without caching*
 
-Env Varibles
+Env Variables
 - CREDENTIALS=Google Service Account credentials JSON
-- HC_DAY_CALANDER=Google Calendar ID for the Timetable Day route
+- HC_DAY_CALENDER=Google Calendar ID for the Timetable Day route
