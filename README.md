@@ -8,6 +8,5 @@ Current methods:
  - `gettimetableday` *In progress*
 
 Env Varibles
-CREDENTIALS=Google Service Account credentials JSON
-HC_DAY_CALANDER=Google Calendar ID for the Timetable Day route
-USE_CACHE=false
+- CREDENTIALS=Google Service Account credentials JSON
+- HC_DAY_CALANDER=Google Calendar ID for the Timetable Day route

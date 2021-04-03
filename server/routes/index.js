@@ -7,8 +7,7 @@ require('dotenv').config();
 /// {data: ResponseObject, cache_day: DateTime}
 let currentDayCache;
 
-const useCache = (process.env.USE_CACHE == "true") || false;
-console.log(process.env.USE_CACHE);
+const useCache = (process.env.NODE_ENV == "production");
 
 /* GET Time Table Day. */
 router.get('/gettimetableday', async function (req, res) {

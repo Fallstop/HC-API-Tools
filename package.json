@@ -5,9 +5,9 @@
   "license": "mit-license",
   "scripts": {
     "run": "node ./dist-server/bin/www.js",
-    "start": "npm-run-all build run",
-    "start:dev": "NODE_ENV=development yarn run start",
-    "start:prod": "NODE_ENV=production yarn run start",
+    "start": "yarn run start:prod",
+    "start:dev": "NODE_ENV=development npm-run-all build run",
+    "start:prod": "NODE_ENV=production npm-run-all build run",
     "transpile": "babel ./server --out-dir dist-server",
     "clean": "rimraf dist-server",
     "clean:full": "rimraf dist-server node_modules",
