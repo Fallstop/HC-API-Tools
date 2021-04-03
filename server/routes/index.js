@@ -2,9 +2,13 @@ import express from 'express';
 var router = express.Router();
 import { getCurrentTimeTableDay } from '../google-calander';
 
+require('dotenv').config();
 
 /// {data: ResponseObject, cache_day: DateTime}
 let currentDayCache;
+
+const useCache = (process.env.USE_CACHE == "true") || false;
+console.log(process.env.USE_CACHE);
 
 /* GET Time Table Day. */
 router.get('/gettimetableday', async function (req, res) {
@@ -13,8 +17,7 @@ router.get('/gettimetableday', async function (req, res) {
 	let nowDate = now.toISOString().split("T")[0];
 
 	// Check cache for HIT
-	if (currentDayCache !== undefined) {
-		console.log("yes", currentDayCache["cache_day"], nowDate)
+	if (currentDayCache !== undefined && useCache) {
 		if (currentDayCache["cache_day"] == nowDate) {
 			console.log("Using Cache");
 			let cachedRepsonse = currentDayCache["data"];
