@@ -10,7 +10,7 @@ const useCache = (process.env.NODE_ENV == "production");
 let currentDayCache: { data: Object, cache_day: String; };
 
 /* GET Time Table Day. */
-apiRouter.get('/gettimetableday', async function (req, res) {
+apiRouter.get('/gettimetableday', async function (req: express.Request, res: express.Response) {
 	// Get Current Date and remove time
 	let now = new Date();
 	let nowDate = now.toISOString().split("T")[0];
@@ -35,7 +35,7 @@ apiRouter.get('/gettimetableday', async function (req, res) {
 	res.json(response);
 });
 
-apiRouter.get('/getdailynotice/:date?', async function (req, res) {
+apiRouter.get('/getdailynotice/:date?', async function (req: express.Request, res: express.Response) {
 	let dateToGet = new Date(req.params.date || new Date());
 	console.log(dateToGet);
 	let result = await getDailyNotice(dateToGet);

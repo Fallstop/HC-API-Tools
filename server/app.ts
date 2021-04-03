@@ -1,6 +1,7 @@
 import express from 'express';
 import logger from 'morgan';
 import cors from 'cors';
+import path from 'path';
 
 
 import { apiRouter } from './routes/api';
@@ -10,6 +11,10 @@ var app = express();
 
 app.use(cors());
 app.use(logger('dev'));
+
+app.set( "views", path.join( __dirname, "views" ) );
+app.set( "view engine", "ejs" );
+
 
 app.use('/api', apiRouter);
 app.use('/',indexRouter)

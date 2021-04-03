@@ -68,10 +68,11 @@ export async function getCurrentTimeTableDay () {
 	let dayNumber;
 	let error;
 	let isSchoolDay = false;
-    console.log("events",events)
     // @ts-ignore
 	for (let event of events) {
 		// Matches events containing day, then captures the number following, (Case insensitive)
+        console.log("events",event)
+        if (event["summary"] === undefined) {continue}
 		let regexCapture = event["summary"].match(/Day ?(\d{1,2})/mi);
 		if (regexCapture) {
 
