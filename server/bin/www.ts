@@ -7,7 +7,6 @@
 
 import debugLib from 'debug';
 import http from 'http';
-import "core-js/stable";
 import "regenerator-runtime/runtime";
 
 const debug = debugLib('debug')('node:server');

@@ -4,18 +4,19 @@
   "private": true,
   "license": "mit-license",
   "scripts": {
-    "run": "node ./dist-server/bin/www.js",
+    "run": "node dist-server/bin/www.js",
     "start": "yarn run start:prod",
-    "start:dev": "NODE_ENV=development npm-run-all build run",
-    "start:prod": "NODE_ENV=production npm-run-all build run",
-    "transpile": "babel ./server --out-dir dist-server",
+    "start:dev": "NODE_ENV=development npm-run-all transpile run",
+    "start:prod": "NODE_ENV=production npm-run-all transpile run",
+    "transpile": "./node_modules/typescript/bin/tsc",
     "clean": "rimraf dist-server",
     "clean:full": "rimraf dist-server node_modules",
-    "build": "npm-run-all clean transpile",
+    "build": "yarn run transpile",
     "dev": "nodemon"
   },
   "babel": {
     "presets": [
+      "@babel/preset-typescript",
       "@babel/preset-env"
     ]
   },
@@ -24,17 +25,17 @@
     "watch": [
       "server/*"
     ],
+    "ext": "js,ts",
     "ignore": [
       "**/__tests__/**",
-      "*.test.js",
-      "*.spec.js"
+      "*.test.ts",
+      "*.spec.ts"
     ]
   },
   "dependencies": {
-    "@babel/cli": "^7.13.14",
-    "@babel/core": "^7.13.14",
-    "@babel/preset-env": "^7.13.12",
-    "core-js": "^3.10.0",
+    "@tsconfig/node14": "^1.0.0",
+    "@types/gapi.calendar": "^3.0.4",
+    "@types/node": "^14.14.37",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "~4.17.1",
@@ -42,7 +43,8 @@
     "morgan": "~1.10.0",
     "npm-run-all": "^4.1.5",
     "regenerator-runtime": "^0.13.7",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.2.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

@@ -5,7 +5,7 @@ Root: https://hctools.jmw.nz/api
 
 
 Current methods:
- - `gettimetableday` *In progress*
+ - `gettimetableday` *Completed*
 
 Env Varibles
 - CREDENTIALS=Google Service Account credentials JSON
