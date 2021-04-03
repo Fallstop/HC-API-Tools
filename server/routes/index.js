@@ -1,41 +1,35 @@
 import express from 'express';
 var router = express.Router();
-import { getEvents } from '../google-calander';
+import { getCurrentTimeTableDay } from '../google-calander';
 
+
+/// {data: ResponseObject, cache_day: DateTime}
+let currentDayCache;
 
 /* GET Time Table Day. */
-router.get('/gettimetableday', async function (req, res, next) {
+router.get('/gettimetableday', async function (req, res) {
+	// Get Current Date and remove time
+	let now = new Date();
+	let nowDate = now.toISOString().split("T")[0];
 
-	// Get Start and End date for an all-day event today
-	let startDate = new Date();
-	let endDate = new Date();
-	startDate.setDate(startDate.getDate());
-	// An all-day event is 1 day (or 86400000 ms) long
-	endDate.setDate(new Date(startDate.getTime() + 86400000).getDate());
-
-	// Retrive events from google calander API
-	let events = await getEvents(startDate, endDate);
-
-
-	let dayNumber;
-	let error;
-	for (let event of events) {
-		// Matches events containg day, then captures the number following, (Case insensitive)
-		let regexCapture = event["summary"].match(/Day ?(\d{1,2})/mi);
-		if (regexCapture) {
-
-			dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
-			console.log("Found Day Number: " + dayNumber);
-			console.log(event);
-			console.log(dayNumber);
+	// Check cache for HIT
+	if (currentDayCache !== undefined) {
+		console.log("yes", currentDayCache["cache_day"], nowDate)
+		if (currentDayCache["cache_day"] == nowDate) {
+			console.log("Using Cache");
+			let cachedRepsonse = currentDayCache["data"];
+			cachedRepsonse["cached"] = true;
+			res.json(cachedRepsonse);
+			return;
 		}
 	}
-	if (dayNumber === undefined) {
-		error = "Day Event Missing from Calander";
-	}
-	// If the perimeter is undefined, the JSON converter ignores it.
-	res.json({ currentDay: dayNumber, error: error, cached: false });
 
+	// Cache MISS, retrive currentDay
+	console.log("Cache MISS, retriving fresh data for ",nowDate)
+	let response = await getCurrentTimeTableDay();
+	currentDayCache = { data: response, cache_day: nowDate };
+	console.log("Got data",currentDayCache)
+	res.json(response);
 });
 
 

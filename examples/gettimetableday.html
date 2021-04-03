@@ -9,19 +9,32 @@
 <body>
     <span id="hcTimeTableDay"></span>
     <script type="text/javascript">
-        fetch("https://hctools.jmw.nz/api/gettimetableday")
+        const messages = {
+            sucessfullPrefex: "",
+            notASchoolDay: "N/A",
+            errorServerSide: "Internal Error",
+        }
+        let textSpan = document.getElementById("hcTimeTableDay");
+        fetch("http://localhost:8080/api/gettimetableday")
             .then(response => response.json())
             .then(data => {
-                let textSpan = document.getElementById("hcTimeTableDay");
-                if ('currentDay' in data) {
+                console.log(data);
+                if (data["isSchoolDay"]) {
                     console.log(data["currentDay"]);
-                    textSpan.innerHTML = data["currentDay"];
-                } else {
+                    textSpan.innerHTML = messages.sucessfullPrefex + data["currentDay"];
+                } else if (!data["isSchoolDay"]) {
+                    textSpan.innerHTML = messages.notASchoolDay;
+                }
+                else if ('internalError' in data) {
                     console.log("Error in gettimetableday API");
-                    console.log(data["error"]);
-                    textSpan.innerHTML = "<Sorry, There was an error retrieving the current day>";
+                    console.log(data["internalError"]);
+                    textSpan.innerHTML = messages.errorServerSide;
                 }
                 
+            })
+            .catch(error => {
+                console.log("Error in gettimetableday API");
+                textSpan.innerHTML = messages.errorServerSide;
             });
     </script>
 </body>
