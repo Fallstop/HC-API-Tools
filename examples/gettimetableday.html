@@ -1,27 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Example Get Timetable Day</title>
 </head>
+
 <body>
     <span id="hcTimeTableDay"></span>
+
     <script type="text/javascript">
         const messages = {
-            sucessfullPrefex: "",
+        schoolDayNumberPrefex: "Day ",
             notASchoolDay: "N/A",
             errorServerSide: "Internal Error",
         }
         let textSpan = document.getElementById("hcTimeTableDay");
-        fetch("http://localhost:8080/api/gettimetableday")
+    // Fetch current timetable day from HC-Tools API
+    // https://github.com/Fallstop/HC-API-Tools
             .then(response => response.json())
             .then(data => {
                 console.log(data);
                 if (data["isSchoolDay"]) {
                     console.log(data["currentDay"]);
-                    textSpan.innerHTML = messages.sucessfullPrefex + data["currentDay"];
+                textSpan.innerHTML = messages.schoolDayNumberPrefex + data["currentDay"];
                 } else if (!data["isSchoolDay"]) {
                     textSpan.innerHTML = messages.notASchoolDay;
                 }
@@ -38,4 +42,5 @@
             });
     </script>
 </body>
+
 </html>
