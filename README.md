@@ -5,7 +5,7 @@ Root: https://hctools.jmw.nz/api
 
 
 Current methods:
- - `gettimetableday` *Completed*
+ - `gettimetableday/<?date>` *Completed*
  - `getdailynotice/<?date>` *Completed, without caching*
 
 Env Variables
