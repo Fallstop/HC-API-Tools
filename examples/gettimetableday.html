@@ -13,19 +13,20 @@
 
     <script type="text/javascript">
         const messages = {
-        schoolDayNumberPrefex: "Day ",
+            schoolDayNumberPrefex: "Day ",
             notASchoolDay: "N/A",
             errorServerSide: "Internal Error",
         }
         let textSpan = document.getElementById("hcTimeTableDay");
-    // Fetch current timetable day from HC-Tools API
-    // https://github.com/Fallstop/HC-API-Tools
+        // Fetch current timetable day from HC-Tools API
+        // https://github.com/Fallstop/HC-API-Tools
+        fetch("http://localhost:8080/api/gettimetableday")
             .then(response => response.json())
             .then(data => {
                 console.log(data);
                 if (data["isSchoolDay"]) {
                     console.log(data["currentDay"]);
-                textSpan.innerHTML = messages.schoolDayNumberPrefex + data["currentDay"];
+                    textSpan.innerHTML = messages.schoolDayNumberPrefex + data["currentDay"];
                 } else if (!data["isSchoolDay"]) {
                     textSpan.innerHTML = messages.notASchoolDay;
                 }
@@ -34,7 +35,7 @@
                     console.log(data["internalError"]);
                     textSpan.innerHTML = messages.errorServerSide;
                 }
-                
+
             })
             .catch(error => {
                 console.log("Error in gettimetableday API");

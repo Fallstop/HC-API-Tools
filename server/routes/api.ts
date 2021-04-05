@@ -1,7 +1,7 @@
 import express from 'express';
 export let apiRouter = express.Router();
 
-import { getCurrentTimeTableDay, getDailyNotice } from '../google-calander';
+import { getCurrentTimeTableDay, getDailyNotice, getBellTimes } from '../google-api';
 import { TimeTableDayHash, convertDateTimeToISODate } from '../mod';
 
 require('dotenv').config();
@@ -42,3 +42,7 @@ apiRouter.get('/getdailynotice/:date?', async function (req: express.Request, re
 	res.json(result);
 });
 
+apiRouter.get('/getbelltimes/', async function (req: express.Request, res: express.Response) {
+	const response: Object = await getBellTimes();
+	res.json(response)
+});
