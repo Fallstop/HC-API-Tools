@@ -8,6 +8,7 @@
 import debugLib from 'debug';
 import http from 'http';
 import "regenerator-runtime/runtime";
+import slowDown from "express-slow-down";
 
 const debug = debugLib('debug')('node:server');
 
@@ -25,6 +26,19 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+/**
+ * Slow Down Rate Limiter Setup
+ */
+//  app.enable("trust proxy");
+ const speedLimiter = slowDown({
+  windowMs: 60000, // 1 minutes
+  delayAfter: 25, // allow 25 requests per minute, then...
+  delayMs: 200 // begin adding 200ms of delay per request above 25:
+});
+
+//  apply to all requests
+app.use(speedLimiter);
 
 /**
  * Listen on provided port, on all network interfaces.

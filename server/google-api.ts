@@ -132,7 +132,6 @@ export async function getBellTimes(): Promise<Object> {
                 }
 
             }
-            console.log({ belltimes: bellTimeMap, cached: false })
             return { belltimes: bellTimeMap, cached: false };
         } else {
             console.log('No data found.');
