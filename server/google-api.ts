@@ -56,10 +56,10 @@ export async function getCurrentTimeTableDay(dateToGet: Date) {
     // Retrieve events from google calender API
     let events = await getEvents(startDate, endDate, HCDayCalendarId);
     if (events === 0) {
-        return { error: "API Error", cached: false };
+        return { error: "API Error" };
     }
     let dayNumber;
-    let error;
+    let error = false;
     let isSchoolDay = false;
     // @ts-ignore
     for (let event of events) {
@@ -78,7 +78,7 @@ export async function getCurrentTimeTableDay(dateToGet: Date) {
         }
     }
     // If the perimeter is undefined, res.json ignores it on the other end
-    return { currentDay: dayNumber, isSchoolDay: isSchoolDay, error: error, cached: false, date: convertDateTimeToISODate(dateToGet) };
+    return { currentDay: dayNumber, isSchoolDay: isSchoolDay, error: error, date: convertDateTimeToISODate(dateToGet) };
 }
 
 export async function getDailyNotice(date: Date) {
@@ -87,7 +87,7 @@ export async function getDailyNotice(date: Date) {
     // Retrieve events from google calender API
     let events = await getEvents(startDate, endDate, HCNoticesCalender);
     if (events === 0) {
-        return { error: "API Error", cached: false };
+        return { error: "API Error" };
     }
 
     let noticeText: string;
@@ -99,10 +99,10 @@ export async function getDailyNotice(date: Date) {
         if (regexCapture) {
             console.log("Found Match", event)
             noticeText = event["description"]
-            return { noticeText: noticeText, isSchoolDay: true, cached: false };
+            return { noticeText: noticeText, isSchoolDay: true };
         }
     }
-    return { isSchoolDay: false, cached: false }
+    return { isSchoolDay: false }
 }
 
 export async function getBellTimes(): Promise<Object> {
@@ -132,13 +132,13 @@ export async function getBellTimes(): Promise<Object> {
                 }
 
             }
-            return { belltimes: bellTimeMap, cached: false };
+            return { belltimes: bellTimeMap };
         } else {
             console.log('No data found.');
-            return { bellTimeMap: { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] }, cached: false }
+            return { bellTimeMap: { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] } }
         }
     } catch (error) {
         console.log(`Error at getEvents --> ${error}`);
-        return { error: error, cached: false }
+        return { error: error }
     }
 };

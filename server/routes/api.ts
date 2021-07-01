@@ -21,7 +21,6 @@ apiRouter.get('/gettimetableday/:date?', async function (req: express.Request, r
 	if (currentDayCache[dateToGet] !== undefined && useCache) {
 		console.log("Using Cache");
 		let cachedResponse = currentDayCache[dateToGet];
-		cachedResponse["cached"] = true;
 		res.json(cachedResponse);
 		return;
 	}
@@ -29,7 +28,9 @@ apiRouter.get('/gettimetableday/:date?', async function (req: express.Request, r
 	// Cache MISS, retrieving currentDay
 	console.log("Cache MISS, retrying fresh data for ", dateToGet);
 	let response = await getCurrentTimeTableDay(dateTimeToGet);
-	currentDayCache[dateToGet] = response;
+	if (!response.error) {
+		currentDayCache[dateToGet] = response;
+	}
 	res.json(response);
 });
 
