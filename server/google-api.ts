@@ -71,7 +71,7 @@ export async function getCurrentTimeTableDay(dateToGet: Date) {
             if (event["start"]["date"] !== convertDateTimeToISODate(dateToGet)) { continue }
 
             dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
-            isSchoolDay = true
+            isSchoolDay = dayNumber != 0
             console.log("Found Day Number: " + dayNumber);
             console.log(event);
             console.log(dayNumber);
