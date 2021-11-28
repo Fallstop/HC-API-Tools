@@ -86,23 +86,19 @@ export async function getDailyNotice(date: Date) {
 
     // Retrieve events from google calender API
     let events = await getEvents(startDate, endDate, HCNoticesCalender);
-    if (events === 0) {
+    if (typeof events === "number") {
         return { error: "API Error" };
     }
+    
+    let isSchoolDay = events.length > 0;
 
-    let noticeText: string;
+    let noticeText: string = "";
 
-    // @ts-ignore
     for (let event of events) {
-        // Matches events containing day, then captures the number following, (Case insensitive)
-        let regexCapture = event["summary"].match(/daily ?notices/mi);
-        if (regexCapture) {
-            console.log("Found Match", event)
-            noticeText = event["description"]
-            return { noticeText: noticeText, isSchoolDay: true };
-        }
+        console.log("Found Notice", event["summary"]);
+        noticeText += (noticeText===""?"":"<br>") +  event["description"];
     }
-    return { isSchoolDay: false }
+    return { isSchoolDay, noticeText }
 }
 
 export async function getBellTimes(): Promise<Object> {
