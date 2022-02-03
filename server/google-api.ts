@@ -96,7 +96,8 @@ export async function getDailyNotice(date: Date) {
 
     for (let event of events) {
         console.log("Found Notice", event["summary"]);
-        noticeText += (noticeText===""?"":"<br>") +  event["description"];
+        if (event["description"] === undefined) { continue }
+        noticeText += (noticeText==="" ? "" : "<br>") +  event["description"];
     }
     return { isSchoolDay, noticeText }
 }
