@@ -95,7 +95,6 @@ export async function getDailyNotice(date: Date) {
     let noticeText: string = "";
 
     for (let event of events) {
-        console.log("Found Notice", event["summary"]);
         if (event["description"] === undefined) { continue }
         noticeText += (noticeText==="" ? "" : "<br>") +  event["description"];
     }

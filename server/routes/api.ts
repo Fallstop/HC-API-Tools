@@ -11,6 +11,7 @@ const useCache = (process.env.USE_CACHE !== "false");
 
 
 let currentDayCache: TimeTableDayHash = {};
+let dailyNoticeCache: object = null;
 
 /* GET Time Table Day. */
 apiRouter.get('/gettimetableday/:date?', async function (req: express.Request, res: express.Response) {
@@ -35,12 +36,25 @@ apiRouter.get('/gettimetableday/:date?', async function (req: express.Request, r
 });
 
 apiRouter.get('/getdailynotice/:date?', async function (req: express.Request, res: express.Response) {
-	let dateToGet = new Date(req.params.date || new Date());
-	let result = await getDailyNotice(dateToGet);
-	res.json(result);
+	if (typeof req.params.date === "undefined" && dailyNoticeCache !== null) {
+		res.json(dailyNoticeCache);
+	} else {
+		let dateToGet = new Date(req.params.date || new Date());
+		let result = await getDailyNotice(dateToGet);
+		res.json(result);
+	}
+
 });
 
 apiRouter.get('/getbelltimes/', async function (req: express.Request, res: express.Response) {
 	const response: Object = await getBellTimes();
 	res.json(response)
 });
+
+async function refreshNoticeCache() {
+	console.log("Refreshing notice cache")
+	let dateToGet = new Date();
+	dailyNoticeCache = await getDailyNotice(dateToGet);
+}
+setInterval(refreshNoticeCache, 1000 * 60 * 60 * 15) // 15 minutes
+refreshNoticeCache()
