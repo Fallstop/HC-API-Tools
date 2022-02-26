@@ -56,5 +56,5 @@ async function refreshNoticeCache() {
 	let dateToGet = new Date();
 	dailyNoticeCache = await getDailyNotice(dateToGet);
 }
-setInterval(()=>{try{refreshNoticeCache}catch(e){console.log(e)}}, 1000 * 60 * 60 * 15) // 15 minutes
+setInterval(refreshNoticeCache, 1000 * 60 * 15) // 15 minutes
 refreshNoticeCache()
