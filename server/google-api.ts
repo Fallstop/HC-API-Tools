@@ -39,10 +39,12 @@ export async function getEvents(dateTimeStart, dateTimeEnd, calendarId): Promise
             calendarId: calendarId,
             timeMin: dateTimeStart,
             timeMax: dateTimeEnd,
-            timeZone: 'Pacific/Auckland'
+            timeZone: 'Pacific/Auckland',
+            fields: 'items(description,end,start,summary)',
         });
 
         let items = response["data"]["items"];
+        
         return items;
     } catch (error) {
         console.log(`Error at getEvents --> ${error}`);
@@ -58,7 +60,7 @@ export async function getCurrentTimeTableDay(dateToGet: Date) {
     if (events === 0) {
         return { error: "API Error" };
     }
-    let dayNumber;
+    let dayNumber: number;
     let error = false;
     let isSchoolDay = false;
     // @ts-ignore
