@@ -1,18 +1,20 @@
 import { google, calendar_v3, sheets_v4 } from 'googleapis';
 require('dotenv').config();
 
-import { convertDateToTimePeriodOfDay, convertDateTimeToISODate, BellTimeHash } from './mod';
+import { convertDateToTimePeriodOfDay, convertDateTimeToISODate, BellTimeHash, LunchTimeActivity, APIError, BellTimes } from './mod';
 
 // Provide the required configuration
-let CREDENTIALS;
-let HCDayCalendarId;
-let HCNoticesCalender;
-let HCBeltimeSheetID
+let CREDENTIALS: { client_email: string; private_key: string; };
+let HCDayCalendarId: string;
+let HCNoticesCalender: string;
+let HCBelltimeSheetID: string;
+let HCLunchTimeActivitiesCalender: string;
 try {
     CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
     HCDayCalendarId = process.env.HC_DAY_CALENDER;
     HCNoticesCalender = process.env.HC_NOTICES_CALENDER;
-    HCBeltimeSheetID = process.env.HC_BELLTIME_SHEET_ID;
+    HCBelltimeSheetID = process.env.HC_BELLTIME_SHEET_ID;
+    HCLunchTimeActivitiesCalender = process.env.HC_LUNCHTIME_ACTIVITIES_CALENDER;
     console.log("Successfully Parsed Credentials");
 } catch {
     console.log("Credentials missing or malformed from .env file (or environment)");
@@ -42,9 +44,7 @@ export async function getEvents(dateTimeStart, dateTimeEnd, calendarId): Promise
             timeZone: 'Pacific/Auckland',
             fields: 'items(description,end,start,summary)',
         });
-
         let items = response["data"]["items"];
-        
         return items;
     } catch (error) {
         console.log(`Error at getEvents --> ${error}`);
@@ -103,12 +103,38 @@ export async function getDailyNotice(date: Date) {
     return { isSchoolDay, noticeText }
 }
 
-export async function getBellTimes(): Promise<Object> {
+export async function getLunchtimeActivity(date: Date): Promise<LunchTimeActivity | APIError> {
+    let [startDate, endDate] = convertDateToTimePeriodOfDay(date);
+
+    // Retrieve events from google calender API
+    let events = await getEvents(startDate, endDate, HCLunchTimeActivitiesCalender);
+    if (typeof events === "number") {
+        return { error: "API Error" };
+    }
+    
+    let weekDay = null;
+    let weekRotation = null;
+
+    for (let event of events) {
+        if (event["summary"] === undefined) { continue }
+        let regexCapture = event["summary"].match(/(\d)-(\d)/mi);
+        if (regexCapture) {
+            weekRotation = parseInt(regexCapture[1]);
+            weekDay = parseInt(regexCapture[2]);
+            console.log(`Found Week Rotation: ${weekRotation} and Week Day: ${weekDay}`);
+            break;
+        }
+
+    }
+    return { weekDay, weekRotation }
+}
+
+export async function getBellTimes(): Promise<BellTimes | APIError> {
     console.log("Yes.")
     try {
         const sheets = await google.sheets({ version: 'v4', auth });
         const googleAPIData = await sheets.spreadsheets.values.get({
-            spreadsheetId: HCBeltimeSheetID,
+            spreadsheetId: HCBelltimeSheetID,
             range: 'timeDataAPI',
 
         })
@@ -133,7 +159,7 @@ export async function getBellTimes(): Promise<Object> {
             return { belltimes: bellTimeMap };
         } else {
             console.log('No data found.');
-            return { bellTimeMap: { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] } }
+            return { belltimes: { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] } }
         }
     } catch (error) {
         console.log(`Error at getEvents --> ${error}`);

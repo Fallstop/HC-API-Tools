@@ -6,15 +6,17 @@ import path from 'path';
 
 import { apiRouter } from './routes/api';
 import { indexRouter } from './routes/index';
+import { oapi } from './mod';
+
+
 
 var app = express();
 
+app.use(oapi)
+app.use('/docs', oapi.swaggerui)
+
 app.use(cors());
 app.use(logger('dev'));
-
-app.set( "views", path.join( __dirname, "views" ) );
-app.set( "view engine", "ejs" );
-
 
 app.use('/api', apiRouter);
 app.use('/',indexRouter)

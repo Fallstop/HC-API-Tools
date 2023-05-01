@@ -1,11 +1,26 @@
 import { formatISO, startOfDay, endOfDay } from 'date-fns';
 
+import openapi from '@wesleytodd/openapi';
+
+
 export interface TimeTableDayHash {
     [details: string]: Object;
 }
 
 export interface BellTimeHash {
     [details: number]: Array<[string,]>;
+}
+
+export interface BellTimes {
+    belltimes: BellTimeHash
+}
+
+export interface LunchTimeActivity {
+    weekDay: number,
+    weekRotation: number 
+}
+export interface APIError {
+    error: string
 }
 
 export function convertDateToTimePeriodOfDay(inputTime: Date): [Date, Date] {
@@ -20,3 +35,13 @@ export function sameDay(d1, d2) {
         d1.getMonth() === d2.getMonth() &&
         d1.getDate() === d2.getDate();
 }
+
+export const oapi = openapi({
+    openapi: '3.0.0',
+    info: {
+      title: 'Express Application',
+      description: 'Generated docs from an Express api',
+      version: '1.0.0',
+    }
+  })
+  
