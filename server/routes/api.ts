@@ -13,7 +13,7 @@ let dailyNoticeCache: object = null;
 let lunchtimeActivityCache: LunchTimeActivity | null = null;
 
 /* GET Time Table Day. */
-apiRouter.get('/gettimetableday/:date?', oapi.validPath({
+apiRouter.get('/gettimetableday/:date?', oapi.path({
 	description: 'Get the timetable day',
 	responses: {
 		200: {
@@ -65,7 +65,7 @@ apiRouter.get('/gettimetableday/:date?', oapi.validPath({
 	res.json(response).status(response.error ? 500 : 200);
 });
 
-apiRouter.get('/getdailynotice/:date?', oapi.validPath({
+apiRouter.get('/getdailynotice/:date?', oapi.path({
 	description: 'Get the daily notice',
 	responses: {
 		200: {
@@ -103,7 +103,7 @@ apiRouter.get('/getdailynotice/:date?', oapi.validPath({
 		res.json(result).status(result.error ? 500 : 200);
 	}
 });
-apiRouter.get('/getlunchtimeactivity/:date?', oapi.validPath({
+apiRouter.get('/getlunchtimeactivity/:date?', oapi.path({
 	description: 'Get the lunch-time activity for the day notice',
 	responses: {
 		200: {
@@ -144,7 +144,7 @@ apiRouter.get('/getlunchtimeactivity/:date?', oapi.validPath({
 	}
 });
 
-apiRouter.get('/getbelltimes/', oapi.validPath({
+apiRouter.get('/getbelltimes/', oapi.path({
 	description: 'Get belltimes for the day',
 	responses: {
 		200: {
@@ -190,12 +190,12 @@ apiRouter.get('/getbelltimes/', oapi.validPath({
 
 // Takes an ADMIN_TOKEN via a post header
 
-apiRouter.post('/refreshcache/', oapi.validPath({
+apiRouter.post('/refreshcache/', oapi.path({
 	description: 'Update the cache',
 		parameters: [
 			{
 				"in": "header",
-				"name": "admin_token",
+				"name": "admintoken",
 				"required": true,
 				"schema": {
 					"type": "string"
@@ -241,15 +241,10 @@ apiRouter.post('/refreshcache/', oapi.validPath({
 				}
 			}
 		}
-	},
-	security: [
-		{
-			"bearerAuth": []
-		}
-	]
+	}
 }), async function (req: express.Request, res: express.Response) {
 	console.log(req.headers, ADMIN_TOKEN, req.headers["admin_token"])
-	if (req.headers["admin_token"] !== `${process.env.ADMIN_TOKEN}`) {
+	if (req.headers["admintoken"] !== `${process.env.ADMIN_TOKEN}`) {
 		return res.status(401).json({ error: "Invalid token" })
 	}
 
