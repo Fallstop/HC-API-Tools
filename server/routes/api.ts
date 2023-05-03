@@ -2,13 +2,11 @@ import express from 'express';
 export let apiRouter = express.Router();
 
 import { getCurrentTimeTableDay, getDailyNotice, getBellTimes, getLunchtimeActivity } from '../google-api';
-import { TimeTableDayHash, convertDateTimeToISODate, sameDay, oapi, LunchTimeActivity } from '../mod';
+import { TimeTableDayHash, convertDateTimeToISODate, sameDay, oapi, LunchTimeActivity, ADMIN_TOKEN } from '../mod';
 
 require('dotenv').config();
 
 const useCache = (process.env.USE_CACHE !== "false");
-
-
 
 let currentDayCache: TimeTableDayHash = {};
 let dailyNoticeCache: object = null;
@@ -105,7 +103,7 @@ apiRouter.get('/getdailynotice/:date?', oapi.validPath({
 		res.json(result).status(result.error ? 500 : 200);
 	}
 });
-apiRouter.get('/getlunchtimeactivity/:date?',oapi.validPath({
+apiRouter.get('/getlunchtimeactivity/:date?', oapi.validPath({
 	description: 'Get the lunch-time activity for the day notice',
 	responses: {
 		200: {
@@ -146,7 +144,7 @@ apiRouter.get('/getlunchtimeactivity/:date?',oapi.validPath({
 	}
 });
 
-apiRouter.get('/getbelltimes/',oapi.validPath({
+apiRouter.get('/getbelltimes/', oapi.validPath({
 	description: 'Get belltimes for the day',
 	responses: {
 		200: {
@@ -158,15 +156,15 @@ apiRouter.get('/getbelltimes/',oapi.validPath({
 							belltimes: {
 								"type": "object",
 								"properties": {
-									"0": {type: "array", items: {type: "string"}},
-									"1": {type: "array", items: {type: "string"}},
-									"2": {type: "array", items: {type: "string"}},
-									"3": {type: "array", items: {type: "string"}},
-									"4": {type: "array", items: {type: "string"}},
-									"5": {type: "array", items: {type: "string"}},
-									"6": {type: "array", items: {type: "string"}}
+									"0": { type: "array", items: { type: "string" } },
+									"1": { type: "array", items: { type: "string" } },
+									"2": { type: "array", items: { type: "string" } },
+									"3": { type: "array", items: { type: "string" } },
+									"4": { type: "array", items: { type: "string" } },
+									"5": { type: "array", items: { type: "string" } },
+									"6": { type: "array", items: { type: "string" } }
 								}
-							 },
+							},
 						}
 					}
 				}
@@ -189,6 +187,82 @@ apiRouter.get('/getbelltimes/',oapi.validPath({
 	const response = await getBellTimes();
 	res.json(response)
 });
+
+// Takes an ADMIN_TOKEN via a post header
+
+apiRouter.post('/refreshcache/', oapi.validPath({
+	description: 'Update the cache',
+		parameters: [
+			{
+				"in": "header",
+				"name": "admin_token",
+				"required": true,
+				"schema": {
+					"type": "string"
+				},
+			}
+		],
+	responses: {
+		200: {
+			content: {
+				'application/json': {
+					schema: {
+						type: 'object',
+						properties: {
+							ok: {
+								"type": "boolean",
+							},
+						}
+					}
+				}
+			}
+		},
+		500: {
+			content: {
+				'application/json': {
+					schema: {
+						type: 'object',
+						properties: {
+							error: { type: 'string' }
+						}
+					}
+				}
+			}
+		},
+		401: {
+			content: {
+				'application/json': {
+					schema: {
+						type: 'object',
+						properties: {
+							error: { type: 'string' }
+						}
+					}
+				}
+			}
+		}
+	},
+	security: [
+		{
+			"bearerAuth": []
+		}
+	]
+}), async function (req: express.Request, res: express.Response) {
+	console.log(req.headers, ADMIN_TOKEN, req.headers["admin_token"])
+	if (req.headers["admin_token"] !== `${process.env.ADMIN_TOKEN}`) {
+		return res.status(401).json({ error: "Invalid token" })
+	}
+
+	try {
+		await refreshInfoCache()
+		return res.json({ ok: true })
+	}
+	catch {
+		return res.status(500).json({ error: "Something went wrong" })
+	}
+
+});
+
 
 async function refreshInfoCache() {
 	let dateToGet = new Date();

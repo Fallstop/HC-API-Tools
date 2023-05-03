@@ -1,6 +1,8 @@
 import { formatISO, startOfDay, endOfDay } from 'date-fns';
 
 import openapi from '@wesleytodd/openapi';
+require('dotenv').config();
+
 
 
 export interface TimeTableDayHash {
@@ -17,7 +19,7 @@ export interface BellTimes {
 
 export interface LunchTimeActivity {
     weekDay: number,
-    weekRotation: number 
+    weekRotation: number
 }
 export interface APIError {
     error: string
@@ -39,9 +41,10 @@ export function sameDay(d1, d2) {
 export const oapi = openapi({
     openapi: '3.0.0',
     info: {
-      title: 'Express Application',
-      description: 'Generated docs from an Express api',
-      version: '1.0.0',
-    }
-  })
-  
+        title: 'Express Application',
+        description: 'Generated docs from an Express api',
+        version: '1.0.0',
+    },
+});
+
+export const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
