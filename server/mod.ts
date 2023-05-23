@@ -17,6 +17,11 @@ export interface BellTimes {
     belltimes: BellTimeHash
 }
 
+export interface PossibleTimeTableDay {
+    dayNumber: number,
+    eventTitle: string
+}
+
 export interface LunchTimeActivity {
     weekDay: number,
     weekRotation: number

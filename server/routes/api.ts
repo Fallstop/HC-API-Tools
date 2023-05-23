@@ -45,7 +45,11 @@ apiRouter.get('/gettimetableday/:date?', oapi.path({
 		}
 	}
 }), async function (req: express.Request, res: express.Response) {
-	let dateTimeToGet = new Date(req.params.date || Date.now());
+	let dateTimeToGet = new Date(req.params.date);
+	if (isNaN(dateTimeToGet.getTime())) {
+		dateTimeToGet = new Date();
+	}
+	console.log(dateTimeToGet)
 	// Get Current Date and remove time
 	let dateToGet: string = convertDateTimeToISODate(dateTimeToGet);
 	// Check cache for HIT

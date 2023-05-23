@@ -1,7 +1,7 @@
 import { google, calendar_v3, sheets_v4 } from 'googleapis';
 require('dotenv').config();
 
-import { convertDateToTimePeriodOfDay, convertDateTimeToISODate, BellTimeHash, LunchTimeActivity, APIError, BellTimes } from './mod';
+import { convertDateToTimePeriodOfDay, convertDateTimeToISODate, BellTimeHash, LunchTimeActivity, APIError, BellTimes, PossibleTimeTableDay } from './mod';
 
 // Provide the required configuration
 let CREDENTIALS: { client_email: string; private_key: string; };
@@ -60,27 +60,43 @@ export async function getCurrentTimeTableDay(dateToGet: Date) {
     if (events === 0) {
         return { error: "API Error" };
     }
-    let dayNumber: number;
-    let error = false;
-    let isSchoolDay = false;
+
+    let ISODate = convertDateTimeToISODate(dateToGet);
+
+    let possibleEvents: PossibleTimeTableDay[] = [];
+
     // @ts-ignore
     for (let event of events) {
+        // Event must have a Title
+        let eventTitle = event["summary"];
+        if (eventTitle === undefined) { continue }
+
         // Matches events containing day, then captures the number following, (Case insensitive)
-        if (event["summary"] === undefined) { continue }
-        let regexCapture = event["summary"].match(/Day ?(\d{1,2})/mi);
+        let regexCapture = eventTitle.match(/Day ?(\d{1,2})/mi);
         if (regexCapture) {
             // Filter weirdness of day notices from other days
-            if (event["start"]["date"] !== convertDateTimeToISODate(dateToGet)) { continue }
+            if (event["start"]["date"] !== ISODate) { continue }
 
-            dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
-            isSchoolDay = dayNumber != 0
+            let dayNumber = parseInt(regexCapture[1]); // [1] is the capture group around the digits
             console.log("Found Day Number: " + dayNumber);
-            console.log(event);
-            console.log(dayNumber);
+            possibleEvents.push({ dayNumber, eventTitle });
         }
     }
+
+    if (possibleEvents.length === 0) {
+        return { isSchoolDay: false, error: false, date: ISODate };
+    } else {
+        possibleEvents = possibleEvents.sort((a, b) => {
+            // For now, score via event summary length. Shortest match is best, most likely to be correct
+            return a.eventTitle.length - b.eventTitle.length;
+        });
+        console.log("Event priority list:", possibleEvents)
+        let currentDay = possibleEvents[0].dayNumber;
+        return { currentDay, isSchoolDay: true, error: false, date: ISODate };
+
+    }
+
     // If the perimeter is undefined, res.json ignores it on the other end
-    return { currentDay: dayNumber, isSchoolDay: isSchoolDay, error: error, date: convertDateTimeToISODate(dateToGet) };
 }
 
 export async function getDailyNotice(date: Date) {
