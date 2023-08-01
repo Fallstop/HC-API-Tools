@@ -42,6 +42,7 @@ export async function getEvents(dateTimeStart, dateTimeEnd, calendarId): Promise
             timeMin: dateTimeStart,
             timeMax: dateTimeEnd,
             timeZone: 'Pacific/Auckland',
+            singleEvents: true,
             fields: 'items(description,end,start,summary)',
         });
         let items = response["data"]["items"];
